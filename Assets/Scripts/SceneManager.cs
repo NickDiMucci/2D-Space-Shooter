@@ -50,6 +50,10 @@ public class SceneManager : MonoBehaviour {
 		lives = playerLives;
 	}
 	
+	public void ReduceLivesByOne() {
+		lives--;
+	}
+	
 	public int GetScore() {
 		return score;
 	}

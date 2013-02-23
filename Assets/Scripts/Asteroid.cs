@@ -16,8 +16,13 @@ public class Asteroid : BaseNpcEntity {
 	}
 	
 	void OnTriggerEnter(Collider other) {
-		base.checkForCollisions(other);
-		base.resetRandomPosition();
+		if (checkForCollisions(other)) {
+			if (explosionParticle) {
+				createExplosionParticle();
+				audio.Play();
+			}
+			base.resetRandomPosition();
+		}
 	}
 	
 	protected override void moveEntityDownward() {
@@ -28,5 +33,14 @@ public class Asteroid : BaseNpcEntity {
 			base.resetRandomSpeed();
 			base.resetRandomScale();
         }
+	}
+	
+	private bool checkForCollisions(Collider other) {
+		return other.tag.Equals("playerbullet") || 
+			other.tag.Equals("enemybullet") ||
+			other.tag.Equals("player") || 
+			other.tag.Equals("shield") ||
+			other.tag.Equals("enemy") ||
+			other.tag.Equals("asteroid");
 	}
 }

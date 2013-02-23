@@ -9,6 +9,8 @@ public class Player : MonoBehaviour {
 	public Transform shield;
 	public Transform jet;
 	
+	private SceneManager sceneManagerScript;
+	
 	public AudioClip hitClip;
 	public AudioClip laserClip;
 	
@@ -34,6 +36,7 @@ public class Player : MonoBehaviour {
 		laser = addAudio(laserClip, false, false, 128.0f);
 		hit = addAudio(hitClip, false, false, 128.0f);
 		obtainScreenBounds();
+		sceneManagerScript = GameObject.Find("SceneManager").GetComponent("SceneManager") as SceneManager;
 	}
 	
 #if UNITY_ANDROID
@@ -67,12 +70,17 @@ public class Player : MonoBehaviour {
 	}
 	
 	void OnTriggerEnter(Collider other) {
-		if (other.tag.Equals("asteroid")) {
-//			lives--;
-			SceneManager sceneManager = GameObject.Find("SceneManager").GetComponent("SceneManager") as SceneManager;
-			sceneManager.SetLives(lives);
+		if (checkForCollisions(other)) {
+			--lives;
+			if (sceneManagerScript) {
+				sceneManagerScript.SetLives(lives);
+			}
 			hit.Play();
 		}
+	}
+	
+	private bool checkForCollisions(Collider other) {
+		return other.tag.Equals("asteroid") || other.tag.Equals("enemy") || other.tag.Equals("enemybullet");
 	}
 	
 	private AudioSource addAudio(AudioClip clip, bool loop, bool playAwake, float volume) {

@@ -23,12 +23,16 @@ public class Shield : MonoBehaviour {
 	}
 	
 	void OnTriggerEnter(Collider other) {
-		if (other.tag.Equals("asteroid")) {
-			health--;
+		if (checkForCollisions(other)) {
+			--health;
 			hit.Play();
 		}
 	}
 	
+	private bool checkForCollisions(Collider other) {
+		return other.tag.Equals("asteroid") || other.tag.Equals("enemybullet") || other.tag.Equals("enemy");
+	}
+		
 	private AudioSource addAudio(AudioClip clip, bool loop, bool playAwake, float volume) {
 		AudioSource audioSource = (AudioSource) gameObject.AddComponent("AudioSource");
 		audioSource.clip = clip;

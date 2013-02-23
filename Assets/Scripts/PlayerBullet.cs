@@ -1,13 +1,15 @@
 using UnityEngine;
 using System.Collections;
 
-public class Bullet : BaseNpcEntity {
-    public GameObject sceneManager;
+public class PlayerBullet : BaseNpcEntity {
+	private SceneManager sceneManagerScript;
+	
 
 	// Use this for initialization
 	void Start() {
 		speed = 15.0f;
 		obtainScreenBounds();
+		sceneManagerScript = GameObject.Find("SceneManager").GetComponent("SceneManager") as SceneManager;
 	}
 	
 	// Update is called once per frame
@@ -19,14 +21,17 @@ public class Bullet : BaseNpcEntity {
 
 
     void OnTriggerEnter(Collider other) {        
-        if (other.gameObject.tag.Equals("asteroid") || other.gameObject.tag.Equals("enemy")) {			
+        if (checkForCollisions(other)) {			
 			increasePlayerScore();
 			Destroy(this.gameObject);
 		}
     }
 	
+	private bool checkForCollisions(Collider other) {
+		return other.tag.Equals("asteroid") || other.tag.Equals("enemy");
+	}
+	
 	private void increasePlayerScore() {
-		SceneManager sceneManagerScript = sceneManager.transform.GetComponent<SceneManager>();
 		if (sceneManagerScript) {
 			sceneManagerScript.AddScore();
 		}

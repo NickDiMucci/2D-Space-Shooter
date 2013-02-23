@@ -10,15 +10,6 @@ public class BaseNpcEntity : MonoBehaviour {
 	
 	protected Vector3 minScreenBounds;
 	protected Vector3 maxScreenBounds;
-	
-	virtual protected void checkForCollisions(Collider other) {
-		if (other.tag.Equals("bullet") || other.tag.Equals("player") || other.tag.Equals("shield")) {
-			if (explosionParticle) {
-				createExplosionParticle();
-				audio.Play();
-			}
-		}
-	}
 
 	virtual protected void createExplosionParticle() {
 		Instantiate(explosionParticle, transform.position, transform.rotation);
@@ -50,7 +41,7 @@ public class BaseNpcEntity : MonoBehaviour {
 	}
 	
     virtual protected void resetRandomPosition() {
-        float randomX = Random.Range(minScreenBounds.x - 2, maxScreenBounds.x);
+        float randomX = Random.Range(minScreenBounds.x + 1, maxScreenBounds.x);
         transform.position = new Vector3(randomX, maxScreenBounds.y + 3, 0);
     }
 
