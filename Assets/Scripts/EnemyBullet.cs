@@ -27,7 +27,7 @@ public class EnemyBullet : BaseNpcEntity {
 	}
 
     private void destroyOutOfBoundsBullet() {
-        if (transform.position.y >= maxScreenBounds.y + 3) {
+        if (transform.position.y < minScreenBounds.y - 1.0f) {
             Destroy(this.gameObject);
         }
     }

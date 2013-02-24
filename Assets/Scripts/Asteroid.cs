@@ -6,7 +6,7 @@ public class Asteroid : BaseNpcEntity {
 	void Start() {
 		speed = Random.Range(6, 15);
 		lowerScaleRandomRange = 0.5f;
-		upperScaleRandomRange = 2.25f;
+		upperScaleRandomRange = 1.25f;
 		obtainScreenBounds();
 	}
 	

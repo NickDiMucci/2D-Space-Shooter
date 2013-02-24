@@ -20,7 +20,9 @@ public class Player : MonoBehaviour {
 	private Vector3 minScreenBounds;
 	private Vector3 maxScreenBounds;
 	
-	public short lives = 3;
+	public Color[] flashColors;
+	
+	public short lives = 5;
 	
 	public int shieldEnergyLevel = 4;
 	
@@ -29,48 +31,40 @@ public class Player : MonoBehaviour {
 	
     public float playerSpeedXAxis = 10.0f;
     public float playerSpeedYAxis = 10.0f;
-	
+	private float flashLerpDuration = 0.10f;
+	private float flashInvokeDuration = 0.5f;	
 
 	// Use this for initialization
-	void Start () {
+	void Start() {
 		laser = addAudio(laserClip, false, false, 128.0f);
 		hit = addAudio(hitClip, false, false, 128.0f);
 		obtainScreenBounds();
 		sceneManagerScript = GameObject.Find("SceneManager").GetComponent("SceneManager") as SceneManager;
+		flashColors = new Color[2];
+		flashColors[0] = Color.magenta;
+		flashColors[1] = Color.white;
 	}
-	
-#if UNITY_ANDROID
-	void OnGUI() {
-		if (GUI.RepeatButton(new Rect(50, Screen.height - 50, 80, 50), "Left")) {
-			transform.Translate(Vector3.left * playerSpeedXAxis * Time.deltaTime);
-		}
-		
-		if (GUI.RepeatButton(new Rect(180, Screen.height - 50, 80, 50), "Right")) {
-			transform.Translate(Vector3.right * playerSpeedXAxis * Time.deltaTime);
-		}
-		if (GUI.Button(new Rect(Screen.width - 80, Screen.height - 50, 50, 50), "Fire")) {
-			fireBullet();
-		}
-	}
-#endif
 	
 	// Update is called once per frame
-	void Update() {		
+	void Update() {
         movePlayer();
         checkScreenBoundaries();
-#if UNITY_ANDROID
-		// TODO: Gotta be a better way to ignore non-android specific code. 
-#else
+		
 		if (Input.GetKeyDown("space") || Input.GetMouseButtonDown(0)) {
         	fireBullet();
 		}
-#endif
+		
 		createShield();
 		checkPlayerLives();
+		
+		if (IsInvoking("colorFlash")) {
+			checkColorFlashInvoking();
+		}
 	}
 	
 	void OnTriggerEnter(Collider other) {
 		if (checkForCollisions(other)) {
+			InvokeRepeating("colorFlash", 0, 0.10f);
 			--lives;
 			if (sceneManagerScript) {
 				sceneManagerScript.SetLives(lives);
@@ -119,16 +113,8 @@ public class Player : MonoBehaviour {
 	}
 
     private void movePlayer() {		
-#if UNITY_ANDROID
-//		if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Moved) {
-//            Vector2 touchDeltaPosition = Input.GetTouch(0).deltaPosition;
-//            transform.Translate(-touchDeltaPosition.x * playerSpeedXAxis, -touchDeltaPosition.y * playerSpeedYAxis, 0);
-//        }
-#else
 		float xTranslation = Input.GetAxis("Horizontal") * playerSpeedXAxis * Time.deltaTime;        
 		transform.Translate(xTranslation, 0, 0);
-#endif
-
     }
 
     private void checkScreenBoundaries() {
@@ -157,5 +143,19 @@ public class Player : MonoBehaviour {
 	
 	public void setShieldOn(bool shieldOn) {
 		this.shieldOn = shieldOn;
+	}
+	
+	private void colorFlash() {
+		float lerp = Mathf.PingPong(Time.time, flashLerpDuration) / flashLerpDuration;
+		renderer.material.color = Color.Lerp(flashColors[0], flashColors[1], lerp);
+	}
+	
+	private void checkColorFlashInvoking() {
+		flashInvokeDuration -= Time.deltaTime;
+		if (flashInvokeDuration <= 0) {
+			CancelInvoke("colorFlash");
+			flashInvokeDuration = 0.5f;
+			renderer.material.color = Color.blue;
+		}
 	}
 }
